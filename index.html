@@ -5,24 +5,26 @@
 <title>Plane Game</title>
 <style>
 body { margin:0; overflow:hidden; }
-canvas { display:block; background:#87CEEB; }
-#joystick {
-    position:absolute;
-    bottom:60px;
-    left:60px;
-    width:120px;
-    height:120px;
-    background:rgba(255,255,255,0.2);
-    border-radius:50%;
+canvas { display:block; }
+
+#joystick{
+position:absolute;
+bottom:60px;
+left:60px;
+width:120px;
+height:120px;
+background:rgba(255,255,255,0.2);
+border-radius:50%;
 }
-#stick {
-    position:absolute;
-    width:60px;
-    height:60px;
-    background:rgba(255,255,255,0.6);
-    border-radius:50%;
-    left:30px;
-    top:30px;
+
+#stick{
+position:absolute;
+width:60px;
+height:60px;
+background:rgba(255,255,255,0.6);
+border-radius:50%;
+left:30px;
+top:30px;
 }
 </style>
 </head>
@@ -31,26 +33,77 @@ canvas { display:block; background:#87CEEB; }
 <div id="joystick"><div id="stick"></div></div>
 <canvas id="game"></canvas>
 
-<script src="sky.js"></script>
-<script src="ground.js"></script>
-<script src="plane.js"></script>
-<script src="joystick.js"></script>
-
 <script>
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-function gameLoop(){
-    drawSky(ctx, canvas);
-    drawGround(ctx, canvas);
-    updatePlane(canvas);
-    drawPlane(ctx);
-    requestAnimationFrame(gameLoop);
+let joystick = {dx:0, dy:0};
+
+let plane = {
+x: canvas.width/2,
+y: canvas.height/2,
+size: 20
+};
+
+function drawSky(){
+ctx.fillStyle = "#87CEEB";
+ctx.fillRect(0,0,canvas.width,canvas.height);
 }
 
-gameLoop();
+function drawGround(){
+ctx.fillStyle = "green";
+ctx.fillRect(0,canvas.height-120,canvas.width,120);
+}
+
+function drawPlane(){
+ctx.fillStyle="red";
+ctx.beginPath();
+ctx.moveTo(plane.x, plane.y-plane.size);
+ctx.lineTo(plane.x-plane.size, plane.y+plane.size);
+ctx.lineTo(plane.x+plane.size, plane.y+plane.size);
+ctx.closePath();
+ctx.fill();
+}
+
+function updatePlane(){
+plane.x += joystick.dx*5;
+plane.y += joystick.dy*5;
+}
+
+function loop(){
+drawSky();
+drawGround();
+updatePlane();
+drawPlane();
+requestAnimationFrame(loop);
+}
+loop();
+
+const joy = document.getElementById("joystick");
+const stick = document.getElementById("stick");
+
+joy.addEventListener("touchmove", e=>{
+const rect = joy.getBoundingClientRect();
+const touch = e.touches[0];
+let x = touch.clientX-rect.left-60;
+let y = touch.clientY-rect.top-60;
+let max=40;
+let dist=Math.sqrt(x*x+y*y);
+if(dist>max){ x=x/dist*max; y=y/dist*max; }
+stick.style.left=(x+30)+"px";
+stick.style.top=(y+30)+"px";
+joystick.dx=x/max;
+joystick.dy=y/max;
+});
+
+joy.addEventListener("touchend", ()=>{
+stick.style.left="30px";
+stick.style.top="30px";
+joystick.dx=0;
+joystick.dy=0;
+});
 </script>
 
 </body>
