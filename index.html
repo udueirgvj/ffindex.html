@@ -1,27 +1,57 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>لعبة الطائرة</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<title>Plane Game</title>
+<style>
+body { margin:0; overflow:hidden; }
+canvas { display:block; background:#87CEEB; }
+#joystick {
+    position:absolute;
+    bottom:60px;
+    left:60px;
+    width:120px;
+    height:120px;
+    background:rgba(255,255,255,0.2);
+    border-radius:50%;
+}
+#stick {
+    position:absolute;
+    width:60px;
+    height:60px;
+    background:rgba(255,255,255,0.6);
+    border-radius:50%;
+    left:30px;
+    top:30px;
+}
+</style>
 </head>
 <body>
-    <div class="game-container">
-        <canvas id="gameCanvas" width="800" height="500"></canvas>
-        
-        <div class="ui-panel">
-            <div class="score">النقاط: <span id="scoreValue">0</span></div>
-            <div class="speed-control">
-                <label for="speedSlider">السرعة:</label>
-                <input type="range" id="speedSlider" min="2" max="15" value="7" step="0.5">
-                <span id="speedValue">7.0</span>
-            </div>
-            <button id="restartBtn">إعادة تشغيل</button>
-        </div>
-    </div>
 
-    <!-- استيراد وحدات JavaScript (باستخدام type="module") -->
-    <script type="module" src="js/game.js"></script>
+<div id="joystick"><div id="stick"></div></div>
+<canvas id="game"></canvas>
+
+<script src="sky.js"></script>
+<script src="ground.js"></script>
+<script src="plane.js"></script>
+<script src="joystick.js"></script>
+
+<script>
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+function gameLoop(){
+    drawSky(ctx, canvas);
+    drawGround(ctx, canvas);
+    updatePlane(canvas);
+    drawPlane(ctx);
+    requestAnimationFrame(gameLoop);
+}
+
+gameLoop();
+</script>
+
 </body>
 </html>
